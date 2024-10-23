@@ -11,6 +11,12 @@ use zeroize::{Zeroize, Zeroizing};
 use crate::errors::{Error, Result};
 use crate::traits::{PrivateKeyParts, PublicKeyParts};
 
+#[cfg(all(target_os = "zkvm", target_arch = "riscv32"))]
+use risc0_zkvm::guest::env;
+#[cfg(all(target_os = "zkvm", target_arch = "riscv32"))]
+use risc0_circuit_bigint::{BigIntClaim, rsa::RSA_3072_X1};
+
+
 /// ⚠️ Raw RSA encryption of m with the public key. No padding is performed.
 ///
 /// # ☢️️ WARNING: HAZARDOUS API ☢️
@@ -19,6 +25,23 @@ use crate::traits::{PrivateKeyParts, PublicKeyParts};
 /// or signature scheme. See the [module-level documentation][crate::hazmat] for more information.
 #[inline]
 pub fn rsa_encrypt<K: PublicKeyParts>(key: &K, m: &BigUint) -> Result<BigUint> {
+    #[cfg(all(target_os = "zkvm", target_arch = "riscv32"))]
+    {
+        // If we're in the RISC Zero zkVM, try to use its RSA accelerator circuit
+        env::log("[TODO] `rsa_encrypt` start");
+        if *key.e() == BigUint::new(vec!{65537}) {
+            // TODO: clean up to escalate error
+            let claims = risc0_circuit_bigint::rsa::compute_claim(key.n(), m).expect("TODO");
+            // TODO: wild hacks, clean up
+            let expected = BigUint::from_bytes_le(&claims[2].to_bytes_le());
+            let claims = [claims[0].clone(), claims[1].clone(), claims[2].clone()];
+            let claims = BigIntClaim::from_biguints(&RSA_3072_X1, &claims);
+            risc0_circuit_bigint::prove(&RSA_3072_X1, &[claims]).expect("Unable to compose with RSA");
+            env::log("[TODO] `rsa_encrypt` ending");
+            return Ok(expected);
+        }
+        // Otherwise fall through because the exponent does not match our accelerator
+    }
     Ok(m.modpow(key.e(), key.n()))
 }
 

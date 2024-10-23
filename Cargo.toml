@@ -31,6 +31,11 @@ sha1 = { version = "0.10.5", optional = true, default-features = false, features
 sha2 = { version = "0.10.6", optional = true, default-features = false, features = ["oid"] }
 serde = { version = "1.0.184", optional = true, default-features = false, features = ["derive"] }
 
+[target.'cfg(all(target_os = "zkvm", target_arch = "riscv32"))'.dependencies]
+# TODO don't use local versions
+risc0-circuit-bigint = { path = "/Users/tzerrell/code/risc0/risc0/circuit/bigint", default-features = false, features = [ "bigint-dig-shim" ] }
+risc0-zkvm = { path = "/Users/tzerrell/code/risc0/risc0/zkvm", default-features = false }
+
 [dev-dependencies]
 base64ct = { version = "1", features = ["alloc"] }
 hex-literal = "0.4.1"
