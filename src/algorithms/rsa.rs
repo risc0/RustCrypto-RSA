@@ -31,7 +31,7 @@ pub fn rsa_encrypt<K: PublicKeyParts>(key: &K, m: &BigUint) -> Result<BigUint> {
             // TODO: clean up error escalation
             return Ok(risc0_circuit_bigint::rsa::modpow_65537(key.n(), m).expect("TODO"));
         }
-        // Fall through when the exponent does not match our accelerator
+        // Fall through when the exponent does not match the accelerator
     }
     Ok(m.modpow(key.e(), key.n()))
 }
