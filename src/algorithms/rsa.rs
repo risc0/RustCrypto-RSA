@@ -14,7 +14,6 @@ use crate::traits::{PrivateKeyParts, PublicKeyParts};
 #[cfg(all(target_os = "zkvm", target_arch = "riscv32"))]
 use risc0_zkvm::guest::env;
 
-
 /// ⚠️ Raw RSA encryption of m with the public key. No padding is performed.
 ///
 /// # ☢️️ WARNING: HAZARDOUS API ☢️
@@ -26,10 +25,11 @@ pub fn rsa_encrypt<K: PublicKeyParts>(key: &K, m: &BigUint) -> Result<BigUint> {
     #[cfg(all(target_os = "zkvm", target_arch = "riscv32"))]
     {
         // If we're in the RISC Zero zkVM, try to use its RSA accelerator circuit
-        if *key.e() == BigUint::new(vec!{65537}) {
+        if *key.e() == BigUint::new(vec![65537]) {
             // TODO: Could escalate errors a bit more nicely
             // (e.g. to fall through to non-accelerated version if error is safe for that)
-            return Ok(risc0_circuit_bigint::rsa::modpow_65537(key.n(), m).expect("Unable to run RSA accelerator"));
+            return Ok(risc0_circuit_bigint::rsa::modpow_65537(key.n(), m)
+                .expect("Unable to run RSA accelerator"));
         }
         // Fall through when the exponent does not match the accelerator
     }
