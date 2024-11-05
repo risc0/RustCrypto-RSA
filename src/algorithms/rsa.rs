@@ -11,9 +11,6 @@ use zeroize::{Zeroize, Zeroizing};
 use crate::errors::{Error, Result};
 use crate::traits::{PrivateKeyParts, PublicKeyParts};
 
-#[cfg(all(target_os = "zkvm", target_arch = "riscv32"))]
-use risc0_zkvm::guest::env;
-
 /// ⚠️ Raw RSA encryption of m with the public key. No padding is performed.
 ///
 /// # ☢️️ WARNING: HAZARDOUS API ☢️
