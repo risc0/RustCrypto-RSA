@@ -28,7 +28,7 @@ pub fn rsa_encrypt<K: PublicKeyParts>(key: &K, m: &BigUint) -> Result<BigUint> {
         if *key.e() == BigUint::new(vec![65537]) {
             // TODO: Could escalate errors a bit more nicely
             // (e.g. to fall through to non-accelerated version if error is safe for that)
-            return Ok(risc0_circuit_bigint::rsa::modpow_65537(key.n(), m)
+            return Ok(risc0_circuit_bigint::rsa::modpow_65537(m, key.n())
                 .expect("Unable to run RSA accelerator"));
         }
         // Fall through when the exponent does not match the accelerator
