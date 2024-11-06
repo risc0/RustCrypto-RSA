@@ -32,8 +32,8 @@ sha2 = { version = "0.10.6", optional = true, default-features = false, features
 serde = { version = "1.0.184", optional = true, default-features = false, features = ["derive"] }
 
 [target.'cfg(all(target_os = "zkvm", target_arch = "riscv32"))'.dependencies]
-risc0-circuit-bigint = { default-features = false, features = [ "bigint-dig-shim" ] }
-risc0-zkvm = { default-features = false }
+risc0-circuit-bigint = { git = "https://github.com/risc0/risc0", default-features = false, features = [ "bigint-dig-shim" ] }
+risc0-zkvm = { git = "https://github.com/risc0/risc0", default-features = false }
 
 [dev-dependencies]
 base64ct = { version = "1", features = ["alloc"] }
@@ -70,11 +70,6 @@ rustdoc-args = ["--cfg", "docsrs"]
 opt-level = 2
 
 # TODO: Point to a version tag once necessary features have stabilized
-[patch.crates-io.risc0-circuit-bigint]
-git = "https://github.com/risc0/risc0"
-branch = "main"
-
-# TODO: Point to a version tag once necessary features have stabilized
-[patch.crates-io.risc0-zkvm]
-git = "https://github.com/risc0/risc0"
-branch = "main"
+[patch.'https://github.com/risc0/risc0.git']
+risc0-circuit-bigint = { git = "https://github.com/risc0/risc0", branch = "main" }
+risc0-zkvm = { git = "https://github.com/risc0/risc0", branch = "main" }
