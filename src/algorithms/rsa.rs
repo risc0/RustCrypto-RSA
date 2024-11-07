@@ -11,6 +11,10 @@ use zeroize::{Zeroize, Zeroizing};
 use crate::errors::{Error, Result};
 use crate::traits::{PrivateKeyParts, PublicKeyParts};
 
+extern "Rust" {
+    todo_test_fn(x: u32) -> u32;
+}
+
 /// ⚠️ Raw RSA encryption of m with the public key. No padding is performed.
 ///
 /// # ☢️️ WARNING: HAZARDOUS API ☢️
@@ -23,8 +27,9 @@ pub fn rsa_encrypt<K: PublicKeyParts>(key: &K, m: &BigUint) -> Result<BigUint> {
     {
         // If we're in the RISC Zero zkVM, try to use its RSA accelerator circuit
         if *key.e() == BigUint::new(vec![65537]) {
-            return Ok(risc0_circuit_bigint::rsa::modpow_65537(m, key.n())
-                .expect("Unexpected failure to run RSA accelerator"));
+            assert_eq!(todo_test_fn(3), 0);
+            // return Ok(risc0_circuit_bigint::rsa::modpow_65537(m, key.n())
+            //     .expect("Unexpected failure to run RSA accelerator"));
         }
         // Fall through when the exponent does not match the accelerator
     }
