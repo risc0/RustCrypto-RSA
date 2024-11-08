@@ -12,8 +12,42 @@ use crate::errors::{Error, Result};
 use crate::traits::{PrivateKeyParts, PublicKeyParts};
 
 extern "Rust" {
-    fn modpow_65537(base: &BigUint, modulus: &BigUint) -> Result<BigUint>;
+    fn modpow_65537_simple(base: &[u32], modulus: &[u32]) -> Result<Vec<u8>>;
+    fn modpow_65537_vecs(base: &Vec<u32>, modulus: &Vec<u32>) -> Result<Vec<u8>>;
+    fn todo_test_fn(x: u32) -> u32;
+    fn todo_test_types(test: &Vec<u32>) -> Result<Vec<u32>>;
 }
+
+
+fn todo_patch_types_modpow(base: &BigUint, modulus: &BigUint) -> BigUint {
+    // Ensure inputs fill an even number of words
+    let mut base = base.to_bytes_le();
+    if base.len() % 4 != 0 {
+        base.resize(base.len() + (4 - (base.len() % 4)), 0);
+    }
+    let mut modulus = modulus.to_bytes_le();
+    if modulus.len() % 4 != 0 {
+        modulus.resize(modulus.len() + (4 - (modulus.len() % 4)), 0);
+    }
+    // Convert inputs to Vecs of u32s
+    let mut base_vec = Vec::new();
+    for word in base.chunks(4) {
+        let word: [u8; 4] = word.try_into().unwrap();
+        base_vec.push(u32::from_le_bytes(word));
+    }
+    let mut modulus_vec = Vec::<u32>::new();
+    for word in modulus.chunks(4) {
+        let word: [u8; 4] = word.try_into().unwrap();
+        modulus_vec.push(u32::from_le_bytes(word));
+    }
+    unsafe {  // TODO
+        // let result = modpow_65537_simple(&base_vec, &modulus_vec).expect("TODO");
+        let result = modpow_65537_vecs(&base_vec, &modulus_vec).expect("TODO");
+        return BigUint::from_bytes_le(&result);
+    }
+}
+
+
 
 /// ⚠️ Raw RSA encryption of m with the public key. No padding is performed.
 ///
@@ -28,8 +62,15 @@ pub fn rsa_encrypt<K: PublicKeyParts>(key: &K, m: &BigUint) -> Result<BigUint> {
         // If we're in the RISC Zero zkVM, try to use its RSA accelerator circuit
         if *key.e() == BigUint::new(vec![65537]) {
             unsafe {
-                return Ok(modpow_65537(m, key.n())
-                    .expect("Unexpected failure to run RSA accelerator"));
+                return Ok(todo_patch_types_modpow(m, key.n()));
+
+                // return Ok(modpow_65537(m, key.n())
+                //     .expect("Unexpected failure to run RSA accelerator"));
+
+                // return Ok(todo_test_fn(0).into());
+
+                // let test_types = todo_test_types(&vec!{3u32})?;
+                // return Ok(test_types[0].into());
             }
         }
         // Fall through when the exponent does not match the accelerator
