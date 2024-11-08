@@ -28,7 +28,8 @@ pub fn rsa_encrypt<K: PublicKeyParts>(key: &K, m: &BigUint) -> Result<BigUint> {
         // If we're in the RISC Zero zkVM, try to use its RSA accelerator circuit
         if *key.e() == BigUint::new(vec![65537]) {
             unsafe {
-                return Ok(modpow_65537(m, key.n()).expect("Unexpected failure to run RSA accelerator"));
+                return Ok(modpow_65537(m, key.n())
+                    .expect("Unexpected failure to run RSA accelerator"));
             }
         }
         // Fall through when the exponent does not match the accelerator
