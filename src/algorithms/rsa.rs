@@ -18,7 +18,7 @@ const WIDTH_WORDS: usize = 96;
 
 #[cfg(all(target_os = "zkvm", target_arch = "riscv32"))]
 extern "C" {
-    fn sys_rsa_and_prove(  // TODO: Better name
+    fn modpow_65537(
         recv_buf: *mut [u32; WIDTH_WORDS],
         in_base: *const [u32; WIDTH_WORDS],
         in_modulus: *const [u32; WIDTH_WORDS],
@@ -50,9 +50,9 @@ fn risc0_modpow_65537(base: &BigUint, modulus: &BigUint) -> BigUint {
         0
     }
     let mut result = [zero(); WIDTH_WORDS];
-    // TODO: doc unsafe
+    // Safety: Parameters are dereferenceable & aligned
     unsafe {
-        sys_rsa_and_prove(&mut result, &base, &modulus);
+        modpow_65537(&mut result, &base, &modulus);
     }
     return BigUint::from_slice(&result);
 }
