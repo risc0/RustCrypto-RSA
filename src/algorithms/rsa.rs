@@ -46,10 +46,7 @@ fn risc0_modpow_65537(base: &BigUint, modulus: &BigUint) -> BigUint {
         .collect::<Vec<u32>>()
         .try_into()
         .unwrap();
-    const fn zero() -> u32 {
-        0
-    }
-    let mut result = [zero(); WIDTH_WORDS];
+    let mut result = [0u32; WIDTH_WORDS];
     // Safety: Parameters are dereferenceable & aligned
     unsafe {
         modpow_65537(&mut result, &base, &modulus);
