@@ -26,6 +26,11 @@ extern "C" {
 }
 
 #[cfg(all(target_os = "zkvm", target_arch = "riscv32"))]
+/// Provides acceleration for ModPow (exponent 65537) in the RISC Zero zkVM
+///
+/// Note that to use this, a dependency on `risc0-circuit-bigint` must be added
+/// to the RISC Zero zkVM guest code calling this even if it is not otherwise
+/// necessary.
 fn risc0_modpow_65537(base: &BigUint, modulus: &BigUint) -> BigUint {
     // Ensure inputs fill an even number of words
     let mut base = base.to_bytes_le();
