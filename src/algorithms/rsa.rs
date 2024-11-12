@@ -41,12 +41,14 @@ fn risc0_modpow_65537(base: &BigUint, modulus: &BigUint) -> BigUint {
     if modulus.len() % 4 != 0 {
         modulus.resize(modulus.len() + (4 - (modulus.len() % 4)), 0);
     }
-    let base: [u32; WIDTH_WORDS] = base.chunks(4)
+    let base: [u32; WIDTH_WORDS] = base
+        .chunks(4)
         .map(|word| u32::from_le_bytes(word.try_into().unwrap()))
         .collect::<Vec<u32>>()
         .try_into()
         .unwrap();
-    let modulus: [u32; WIDTH_WORDS] = modulus.chunks(4)
+    let modulus: [u32; WIDTH_WORDS] = modulus
+        .chunks(4)
         .map(|word| u32::from_le_bytes(word.try_into().unwrap()))
         .collect::<Vec<u32>>()
         .try_into()
