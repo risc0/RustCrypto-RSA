@@ -472,7 +472,7 @@ checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
 [[package]]
 name = "risc0-bigint2"
 version = "1.2.0-alpha.1"
-source = "git+https://github.com/risc0/risc0?rev=43e5883d0dad5c405e565c9327cf7346f4431216#43e5883d0dad5c405e565c9327cf7346f4431216"
+source = "git+https://github.com/risc0/risc0?rev=3524a8a15ec239da1f064803b90fec7a02476e37#3524a8a15ec239da1f064803b90fec7a02476e37"
 dependencies = [
  "include_bytes_aligned",
  "num-bigint-dig",
