@@ -464,6 +464,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08c74e62047bb2de4ff487b251e4a92e24f48745648451635cec7d591162d9f"
 
 [[package]]
+name = "risc0-bigint2"
+version = "1.2.0-alpha.1"
+source = "git+https://github.com/risc0/risc0?rev=651637b1d17c6f5f0052f637c8634faa5f467689#651637b1d17c6f5f0052f637c8634faa5f467689"
+dependencies = [
+ "num-bigint-dig",
+]
+
+[[package]]
 name = "rsa"
 version = "0.9.6"
 dependencies = [
@@ -481,6 +489,7 @@ dependencies = [
  "rand_chacha",
  "rand_core",
  "rand_xorshift",
+ "risc0-bigint2",
  "serde",
  "serde_test",
  "sha1",
