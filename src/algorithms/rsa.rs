@@ -21,9 +21,14 @@ use crate::traits::{PrivateKeyParts, PublicKeyParts};
 pub fn rsa_encrypt<K: PublicKeyParts>(key: &K, m: &BigUint) -> Result<BigUint> {
     #[cfg(target_os = "zkvm")]
     {
+        use risc0_bigint2::ToBigInt2Buffer;
         // If we're in the RISC Zero zkVM, try to use an accelerated version.
         if *key.e() == BigUint::new(vec![65537]) {
-            return Ok(risc0_bigint2::rsa::modpow_65537(m, key.n()));
+            let m = m.to_u32_array();
+            let n = key.n().to_u32_array();
+            let mut result = [0u32; 128];
+            risc0_bigint2::rsa::modpow_65537(&m, &n, &mut result);
+            return Ok(BigUint::from_u32_array(result));
         }
         // Fall through when the exponent does not match the accelerator
     }
