@@ -31,13 +31,12 @@ sha1 = { version = "0.10.5", optional = true, default-features = false, features
 sha2 = { version = "0.10.6", optional = true, default-features = false, features = ["oid"] }
 serde = { version = "1.0.184", optional = true, default-features = false, features = ["derive"] }
 
-[target.'cfg(target_os = "zkvm")'.dependencies]
+[target.'cfg(all(target_os = "zkvm", target_arch = "riscv32"))'.dependencies]
 risc0-bigint2 = { version = "1.2.0", default-features = false, features = ["num-bigint-dig", "unstable"] }
 
 [dev-dependencies]
 base64ct = { version = "1", features = ["alloc"] }
 hex-literal = "0.4.1"
-proptest = "1"
 serde_test = "1.0.89"
 rand_xorshift = "0.3"
 rand_chacha = "0.3"
@@ -46,6 +45,13 @@ rand_core = { version = "0.6", default-features = false }
 sha1 = { version = "0.10.5", default-features = false, features = ["oid"] }
 sha2 = { version = "0.10.6", default-features = false, features = ["oid"] }
 sha3 = { version = "0.10.7", default-features = false, features = ["oid"] }
+
+[target.'cfg(not(all(target_os = "zkvm", target_arch = "riscv32")))'.dev-dependencies]
+proptest = "1"
+
+[target.'cfg(all(target_os = "zkvm", target_arch = "riscv32"))'.dev-dependencies]
+# getrandom impl for zkvm needed for tests
+risc0-zkvm-platform = { version = "1.2.0", features = ["getrandom", "unstable"] }
 
 [[bench]]
 name = "key"

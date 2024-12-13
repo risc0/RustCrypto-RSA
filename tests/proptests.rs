@@ -1,4 +1,5 @@
 //! Property-based tests.
+#![cfg(not(all(target_os = "zkvm", target_arch = "riscv32")))]
 
 use proptest::prelude::*;
 use rand_chacha::ChaCha8Rng;
