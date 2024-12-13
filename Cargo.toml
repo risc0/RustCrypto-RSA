@@ -31,6 +31,9 @@ sha1 = { version = "0.10.5", optional = true, default-features = false, features
 sha2 = { version = "0.10.6", optional = true, default-features = false, features = ["oid"] }
 serde = { version = "1.0.184", optional = true, default-features = false, features = ["derive"] }
 
+[target.'cfg(target_os = "zkvm")'.dependencies]
+risc0-bigint2 = { version = "1.2.0", default-features = false, features = ["num-bigint-dig", "unstable"] }
+
 [dev-dependencies]
 base64ct = { version = "1", features = ["alloc"] }
 hex-literal = "0.4.1"
