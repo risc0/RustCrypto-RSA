@@ -593,6 +593,8 @@ mod test {
         }
     }
 
+    // Ignore test in zkvm, it's too large (can test manually)
+    #[cfg(not(all(target_os = "zkvm", target_arch = "riscv32")))]
     #[test]
     // Tests the corner case where the key is multiple of 8 + 1 bits long
     fn test_sign_and_verify_2049bit_key() {
