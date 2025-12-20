@@ -6,6 +6,8 @@ use num_bigint::{BigInt, BigUint, IntoBigInt, IntoBigUint, ModInverse, RandBigIn
 use num_integer::{sqrt, Integer};
 use num_traits::{FromPrimitive, One, Pow, Signed, Zero};
 use rand_core::CryptoRngCore;
+#[cfg(target_os = "zkvm")]
+use risc0_bigint2::ToBigInt2Buffer;
 use zeroize::{Zeroize, Zeroizing};
 
 use crate::errors::{Error, Result};
@@ -22,8 +24,14 @@ pub fn rsa_encrypt<K: PublicKeyParts>(key: &K, m: &BigUint) -> Result<BigUint> {
     #[cfg(target_os = "zkvm")]
     {
         // If we're in the RISC Zero zkVM, try to use an accelerated version.
-        if *key.e() == BigUint::new(vec![65537]) {
-            return Ok(risc0_bigint2::rsa::modpow_65537(m, key.n()));
+        if m.bits() <= 4096 && key.n().bits() <= 4096 && *key.e() == BigUint::new(vec![65537]) {
+            let mut result = [0u32; risc0_bigint2::field::FIELD_4096_WIDTH_WORDS];
+            risc0_bigint2::rsa::modpow_65537(
+                &m.to_u32_array(),
+                &key.n().to_u32_array(),
+                &mut result,
+            );
+            return Ok(BigUint::from_slice(&result));
         }
         // Fall through when the exponent does not match the accelerator
     }
