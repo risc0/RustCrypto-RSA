@@ -184,7 +184,7 @@ impl RsaPublicKey {
     /// Create a new public key from its components.
     pub fn new_with_max_size(n: BigUint, e: BigUint, max_size: usize) -> Result<Self> {
         let k = Self { n, e };
-        check_public_with_max_size(&k, max_size)?;
+        check_public_with_max_size(&k, Some(max_size))?;
         Ok(k)
     }
 
@@ -251,7 +251,6 @@ impl RsaPrivateKey {
         d: BigUint,
         mut primes: Vec<BigUint>,
     ) -> Result<RsaPrivateKey> {
-        let mut should_validate = false;
         if primes.len() < 2 {
             if !primes.is_empty() {
                 return Err(Error::NprimesTooSmall);
@@ -261,7 +260,6 @@ impl RsaPrivateKey {
             let (p, q) = recover_primes(&n, &e, &d)?;
             primes.push(p);
             primes.push(q);
-            should_validate = true;
         }
 
         let mut k = RsaPrivateKey {
@@ -271,10 +269,8 @@ impl RsaPrivateKey {
             precomputed: None,
         };
 
-        // Validate the key if we had to recover the primes.
-        if should_validate {
-            k.validate()?;
-        }
+        // Always validate the key, to ensure precompute can't fail
+        k.validate()?;
 
         // precompute when possible, ignore error otherwise.
         let _ = k.precompute();
@@ -497,14 +493,19 @@ impl PrivateKeyParts for RsaPrivateKey {
 /// Check that the public key is well formed and has an exponent within acceptable bounds.
 #[inline]
 pub fn check_public(public_key: &impl PublicKeyParts) -> Result<()> {
-    check_public_with_max_size(public_key, RsaPublicKey::MAX_SIZE)
+    check_public_with_max_size(public_key, None)
 }
 
 /// Check that the public key is well formed and has an exponent within acceptable bounds.
 #[inline]
-fn check_public_with_max_size(public_key: &impl PublicKeyParts, max_size: usize) -> Result<()> {
-    if public_key.n().bits() > max_size {
-        return Err(Error::ModulusTooLarge);
+fn check_public_with_max_size(
+    public_key: &impl PublicKeyParts,
+    max_size: Option<usize>,
+) -> Result<()> {
+    if let Some(max_size) = max_size {
+        if public_key.n().bits() > max_size {
+            return Err(Error::ModulusTooLarge);
+        }
     }
 
     let e = public_key
@@ -717,13 +718,13 @@ mod tests {
             Base64::decode_vec("CUWC+hRWOT421kwRllgVjy6FYv6jQUcgDNHeAiYZnf5HjS9iK2ki7v8G5dL/0f+Yf+NhE/4q8w4m8go51hACrVpP1p8GJDjiT09+RsOzITsHwl+ceEKoe56ZW6iDHBLlrNw5/MtcYhKpjNU9KJ2udm5J/c9iislcjgckrZG2IB8ADgXHMEByZ5DgaMl4AKZ1Gx8/q6KftTvmOT5rNTMLi76VN5KWQcDWK/DqXiOiZHM7Nr4dX4me3XeRgABJyNR8Fqxj3N1+HrYLe/zs7LOaK0++F9Ul3tLelhrhsvLxei3oCZkF9A/foD3on3luYA+1cRcxWpSY3h2J4/22+yo4+Q==").unwrap(),
         ];
 
-        RsaPrivateKey::from_components(
+        let res = RsaPrivateKey::from_components(
             BigUint::from_bytes_be(&n),
             BigUint::from_bytes_be(&e),
             BigUint::from_bytes_be(&d),
             primes.iter().map(|p| BigUint::from_bytes_be(p)).collect(),
-        )
-        .unwrap();
+        );
+        assert_eq!(res, Err(Error::InvalidModulus));
     }
 
     #[test]

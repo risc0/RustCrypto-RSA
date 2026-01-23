@@ -18,7 +18,17 @@ prop_compose! {
     }
 }
 
+fn config() -> ProptestConfig {
+    if cfg!(all(target_os = "zkvm", target_arch = "riscv32")) {
+        ProptestConfig::with_cases(1)
+    } else {
+        ProptestConfig::default()
+    }
+}
+
 proptest! {
+    #![proptest_config(config())]
+
     #[test]
     fn pkcs1v15_sign_roundtrip(private_key in private_key(), msg in any::<Vec<u8>>()) {
         let signing_key = pkcs1v15::SigningKey::<Sha256>::new(private_key);

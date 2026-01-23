@@ -1,6 +1,6 @@
 [package]
 name = "rsa"
-version = "0.9.6"
+version = "0.9.9"
 authors = ["RustCrypto Developers", "dignifiedquire <dignifiedquire@gmail.com>"]
 edition = "2021"
 description = "Pure Rust RSA implementation"
@@ -32,12 +32,12 @@ sha2 = { version = "0.10.6", optional = true, default-features = false, features
 serde = { version = "1.0.184", optional = true, default-features = false, features = ["derive"] }
 
 [target.'cfg(target_os = "zkvm")'.dependencies]
-risc0-bigint2 = { git = "https://github.com/risc0/risc0", rev = "8fc8437633f08a66e0fbacce947f41d01b074774", default-features = false, features = ["num-bigint-dig"] }
+getrandom = { version = "0.2", default-features = false, features = ["custom"] }
+risc0-bigint2 = { version = "1.4.11", features = ["num-bigint-dig"] }
 
 [dev-dependencies]
 base64ct = { version = "1", features = ["alloc"] }
 hex-literal = "0.4.1"
-proptest = "1"
 serde_test = "1.0.89"
 rand_xorshift = "0.3"
 rand_chacha = "0.3"
@@ -46,6 +46,12 @@ rand_core = { version = "0.6", default-features = false }
 sha1 = { version = "0.10.5", default-features = false, features = ["oid"] }
 sha2 = { version = "0.10.6", default-features = false, features = ["oid"] }
 sha3 = { version = "0.10.7", default-features = false, features = ["oid"] }
+
+[target.'cfg(not(target_os = "zkvm"))'.dev-dependencies]
+proptest = "1"
+
+[target.'cfg(target_os = "zkvm")'.dev-dependencies]
+proptest = { version = "1", default-features = false, features = ["alloc"] }
 
 [[bench]]
 name = "key"

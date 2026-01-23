@@ -1,9 +1,4 @@
-#[allow(unused_imports)]
-pub use ::signature::{
-    hazmat::{PrehashSigner, PrehashVerifier},
-    DigestSigner, DigestVerifier, Error, Keypair, RandomizedDigestSigner, RandomizedSigner, Result,
-    SignatureEncoding, Signer, Verifier,
-};
+pub use ::signature::SignatureEncoding;
 use spki::{
     der::{asn1::BitString, Result as DerResult},
     SignatureBitStringEncoding,
